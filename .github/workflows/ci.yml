@@ -1,0 +1,27 @@
+name : CI-PIPELINE
+
+on: 
+  push: 
+    branches: [ main ]
+  pull-request:
+    branches: [ main ]
+  workflow-dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout
+      - name: Instalation python
+      - uses: actions/setup-python
+        with:
+          python-version: "3.11"
+      - name: Installer dependance
+        run: pip install -r requirements.txt
+      - name: Lint avec flake8
+        run: |
+          flake8 app --count --select=E9,F63,F7,F82,F841 --show-source --statistics
+          flake8 app --count --max-complexity=10 --max-line-length=127 --statistics
+          flake8 tests --count --max-line-length=127 --statistics
+      - name: Lancement des tests
+        run: pytest -v --cov=app
